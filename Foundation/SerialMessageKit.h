@@ -5,8 +5,8 @@
  *      Author: Jimmy
  */
 
-#ifndef FOUNDATION_SERIALKIT_H_
-#define FOUNDATION_SERIALKIT_H_
+#ifndef FOUNDATION_SERIALMESSAGEKIT_H_
+#define FOUNDATION_SERIALMESSAGEKIT_H_
 
 #include "DataRequest.h"
 #include "Listener.h"
@@ -90,4 +90,4 @@ private:
 };
 
 
-#endif /* FOUNDATION_SERIALKIT_H_ */
+#endif /* FOUNDATION_SERIALMESSAGEKIT_H_ */
