@@ -18,9 +18,12 @@ public:
 	//constructor
 	//
 
-	SerialIdentifier()
+	SerialIdentifier(uint8_t identity[BYTES])
 	{
-
+		for (int i = 0; i<BYTES; i++)
+		{
+			identifier_[i] = identity[i];
+		}
 	}
 
 
@@ -30,14 +33,61 @@ public:
 
 	bool compare(uint8_t* externalIdent, uint8_t length)
 	{
-		if (BYTES > length)
+		if (BYTES > length) //locally there is more text to compare than is being given
 		{
+			for (int i = 0; i<length; i++)
+			{
+				if (*externalIdent[i] != identifier_[i])
+				{
+					return false;
+				}
+			}
+
+			return true;
 			//examine only the first part of BYTES
 		}
 		else
 		{
+			for (int i = 0; i<BYTES; i++)
+			{
+				if (*externalIdent[i] != identifier_[i])
+				{
+					return false;
+				}
+			}
+
+			return true;
 			//examine only the first part of externalident
 		}
+	}
+
+
+	//
+	//setIdentifier(uint8_t [BYTES])
+	//
+
+	void setIdentifier(uint8_t identifier[BYTES])
+	{
+		for (int i = 0; i<BYTES; i++)
+		{
+			identifier_[i] = identifier[i];
+		}
+	}
+
+
+	uint8_t* getIdentifier()
+	{
+		return &identifier_;
+	}
+
+
+	//
+	//getIdLength()
+	//
+
+	uint8_t getIdLength()
+	{
+		return BYTES;
 	}
 
 private:
