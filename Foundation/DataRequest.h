@@ -16,6 +16,8 @@ class DataRequest
 
 	virtual uint8_t onPullByte() = 0;
 
+	virtual void flag() = 0;
+
 	virtual void onPushByte(uint8_t push) = 0;
 };
 
