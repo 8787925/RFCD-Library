@@ -12,7 +12,7 @@
 
 template <const uint8_t LENGTH>
 
-class DataPayload: public DataRequest
+class DataPayload: virtual public DataRequest
 {
 public:
 	//
