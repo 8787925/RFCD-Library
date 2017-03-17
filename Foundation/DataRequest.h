@@ -12,26 +12,23 @@
 
 class DataRequest
 {
-	virtual uint8_t onByteRequest() = 0;
+public:
 
-	virtual uint8_t onPullByte() = 0;
+	DataRequest()
+	{
+		pushBytePosition_ = 0;
+		pullBytePosition_ = 0;
+	}
+	//virtual uint8_t onByteRequest(bool* endOfStream) ;
 
-	virtual void flag() = 0;
+	virtual uint8_t onPullByte(bool* endOfStream) = 0;
 
-	virtual void onPushByte(uint8_t push) = 0;
+	virtual void onPushByte(uint8_t push, bool* newStream) = 0;
+
+	//virtual void onPushComplete() = 0;
+
+	uint8_t pushBytePosition_;
+	uint8_t pullBytePosition_;
 };
-
-/*
-class pushByte
-{
-	virtual void onPushByte(uint8_t push) = 0;
-};
-
-
-class pullByte
-{
-	virtual uint8_t onPullByte() = 0;
-};
-*/
 
 #endif /* FOUNDATION_DATAREQUEST_H_ */
