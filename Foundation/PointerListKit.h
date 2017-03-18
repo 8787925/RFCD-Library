@@ -131,14 +131,27 @@ public:
 	//itterate()
 	//
 
-	T* itterate()
+	T* itterate(bool* newLoop)
 	{
-		itterator_ ++;
-		if (itterator_ == LENGTH)
+		if ( *newLoop)
 		{
-			itterator_ = 1;
+			itterator_ = 0;
+			*newLoop = false;
 		}
-		return list_[itterator_-1];
+
+		if (itterator_ < LENGTH)
+		{
+			itterator_++;
+			if (itterator_ >= LENGTH) //if this is the last entry
+			{
+				*newLoop = true;
+			}
+
+			return list_[itterator_-1];
+		}
+
+		*newLoop = true;
+		return 0;
 	}
 
 
