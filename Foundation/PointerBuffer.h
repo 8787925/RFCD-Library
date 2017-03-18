@@ -13,7 +13,7 @@
 template <class T, const uint8_t BUFFERLENGTH>
 
 class FifoPointerBuffer: public PointerList <T, BUFFERLENGTH>
-{
+{public:
 	//
 	//constructor
 	//
