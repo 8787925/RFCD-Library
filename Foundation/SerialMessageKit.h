@@ -5,19 +5,29 @@
  *      Author: Jimmy
  */
 
+//#include "Config.h"
+
 #ifndef FOUNDATION_SERIALMESSAGEKIT_H_
 #define FOUNDATION_SERIALMESSAGEKIT_H_
 
-#include "DataRequest.h"
-#include "Listener.h"
+#include "Foundation\DataPayloadKit.h"
+#include "Foundation\SerialIdentifierkit.h"
+#include "Foundation\Listener.h"
 
 #ifndef MAX_SERIAL_DEVICE_MESSAGES
 #define MAX_SERIAL_DEVICE_MESSAGES 10
 #endif
 
-template <const uint8_t LENGTH>
+#ifndef SERIAL_IDENTIFIER_LENGTH
+#define SERIAL_IDENTIFIER_LENGTH 5
+#endif
 
-class SerialMessage: public Listener, public DataRequest
+
+
+
+template <const uint8_t LENGTH, const uint8_t IDENTITYLENGTH>
+
+class SerialMessage: public SerialIdentifier<IDENTITYLENGTH>, public DataPayload<LENGTH>
 {
 public:
 
@@ -25,17 +35,17 @@ public:
 	//constructor
 	//
 
-	SerialMessage(SerialDevice <MAX_SERIAL_DEVICE_MESSAGES>* serialNetwork)
+	SerialMessage(txOrRx direction, uint8_t *identity, serialPayloadType payloadType, uint8_t terminatorOrLength) :
+		SerialIdentifier<IDENTITYLENGTH>(identity, payloadType, terminatorOrLength),
+		DataPayload<LENGTH>(0xFF)
 	{
-		serialNetwork_ = serialNetwork;
-
-		for (int i=0; i<LENGTH; i++)
-		{
-			messageBytes_[i] = 0;
-		}
-
-		sendIndex_ = 0;
+		messageDirection_ = direction;
 		sending_ = false;
+		recieving_ = false;
+		if ((direction == RXonly) || (direction == BOTH))
+		{
+			this->enableRecieve();
+		}
 	}
 
 
@@ -43,50 +53,59 @@ public:
 	//send()
 	//
 
-	void send()
+	virtual void send()
 	{
-		if (!sending_)
-		{
-			sendIndex_ = 0;
-			sending_ = true;
-			serialNetwork_->startStream(this);
-		}
+		return;
 	}
 
 
 	//
-	//onByteRequest()
+	//enableRecieve()
 	//
 
-	uint8_t onPullByte()
+	virtual void enableRecieve()
 	{
-		if ((sending_) && (sendIndex_ < LENGTH))
-		{
-			return messageBytes_[sendIndex_];
-			sendIndex_++;
-			if (sendIndex_>= LENGTH)
-			{
-				serialNetwork_->finishedStream(this);
-			}
-		}
-		else
-		{
-			serialNetwork_->finishedStream(this);
-			return 0;
-		}
+		return;
 	}
+
+
+	//
+	//disableRecieve()
+	//
+
+	virtual void disableRecieve()
+	{
+		return;
+	}
+
+
+	//
+	//getMessageLength()
+	//
+
+	uint8_t getMessageLength()
+	{
+		return LENGTH;
+	}
+
+
+	//
+	//virtual onListener()
+	//
+
+	virtual void listenerEvent()
+	{
+		return;
+	}
+
 
 private:
-
 	//
 	//variables
 	//
 
-	SerialDevice <MAX_SERIAL_DEVICE_MESSAGES>* serialNetwork_;
-	uint8_t messageBytes_[LENGTH];
-	uint8_t sendIndex_;
-	bool sending_;
-
+	bool sending_, recieving_;
+	txOrRx messageDirection_;
 };
 
 

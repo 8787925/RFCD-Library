@@ -8,21 +8,98 @@
 #ifndef FOUNDATION_SERIALIDENTIFIERKIT_H_
 #define FOUNDATION_SERIALIDENTIFIERKIT_H_
 
+#include "Foundation\DataRequest.h"
+#include "Foundation\Listener.h"
+
+enum txOrRx
+{
+	TXonly,
+	RXonly,
+	BOTH
+};
+
+enum serialPayloadType
+{
+	ASCII,
+	BINARY
+};
 
 template <const uint8_t BYTES>
 
-class SerialIdentifier
+class SerialIdentifier: virtual public DataRequest, virtual public Listener
 {
 public:
 	//
 	//constructor
 	//
 
-	SerialIdentifier(uint8_t identity[BYTES])
+	SerialIdentifier(uint8_t* identity, serialPayloadType payloadType, uint8_t arg)
 	{
+		if (payloadType == ASCII)
+		{
+			terminator_ = arg;
+			payloadSize_ = 0;
+		}
+		else
+		{
+			terminator_ = 255;
+			payloadSize_ = arg;
+		}
+
+		payloadType_ = payloadType;
+
 		for (int i = 0; i<BYTES; i++)
 		{
 			identifier_[i] = identity[i];
+		}
+	}
+
+
+	//
+	//getTerminator()
+	//
+
+	uint8_t getTerminator()
+	{
+		return terminator_;
+	}
+
+	void setTerminator(uint8_t terminator)
+	{
+		terminator_ = terminator;
+	}
+
+
+	//
+	//getPayloadSize()
+	//
+
+	uint8_t getPayloadSize()
+	{
+		return payloadSize_;
+	}
+
+
+	//
+	//getPayloadType()
+	//
+
+	serialPayloadType getPayloadType()
+	{
+		return payloadType_;
+	}
+
+	void setPayloadType(serialPayloadType type)
+	{
+		payloadType_ = type;
+
+		if (type == ASCII)
+		{
+			payloadSize_ = 0;
+		}
+		else
+		{
+			terminator_ = 255;
 		}
 	}
 
@@ -37,7 +114,7 @@ public:
 		{
 			for (int i = 0; i<length; i++)
 			{
-				if (*externalIdent[i] != identifier_[i])
+				if (externalIdent[i] != identifier_[i])
 				{
 					return false;
 				}
@@ -50,7 +127,7 @@ public:
 		{
 			for (int i = 0; i<BYTES; i++)
 			{
-				if (*externalIdent[i] != identifier_[i])
+				if (externalIdent[i] != identifier_[i])
 				{
 					return false;
 				}
@@ -66,7 +143,7 @@ public:
 	//setIdentifier(uint8_t [BYTES])
 	//
 
-	void setIdentifier(uint8_t identifier[BYTES])
+	void setIdentifier(uint8_t *identifier)
 	{
 		for (int i = 0; i<BYTES; i++)
 		{
@@ -77,7 +154,7 @@ public:
 
 	uint8_t* getIdentifier()
 	{
-		return &identifier_;
+		return &identifier_[0];
 	}
 
 
@@ -96,6 +173,9 @@ private:
 	//
 
 	uint8_t identifier_[BYTES];
+	uint8_t payloadSize_;
+	uint8_t terminator_;
+	serialPayloadType payloadType_;
 
 };
 
