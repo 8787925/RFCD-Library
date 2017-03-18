@@ -1,0 +1,8 @@
+﻿  SerialManagerTest.cpp
+c:\users\mattb\documents\localgit\rfcd-library\foundation\serialmessagekit.h(109): warning C4250: 'SerialMessage<10,5>': inherits 'DataPayload<10>::DataPayload<10>::onPullByte' via dominance
+  c:\users\mattb\documents\localgit\rfcd-library\foundation\datapayloadkit.h(33): note: see declaration of 'DataPayload<10>::onPullByte'
+  c:\users\mattb\documents\localgit\rfcd-library\test rigs\serialmanagertest\serialmanagertest\serialmanagertest.cpp(42): note: see reference to class template instantiation 'SerialMessage<10,5>' being compiled
+c:\users\mattb\documents\localgit\rfcd-library\foundation\serialmessagekit.h(109): warning C4250: 'SerialMessage<10,5>': inherits 'DataPayload<10>::DataPayload<10>::onPushByte' via dominance
+  c:\users\mattb\documents\localgit\rfcd-library\foundation\datapayloadkit.h(69): note: see declaration of 'DataPayload<10>::onPushByte'
+  SerialManagerTest.vcxproj -> C:\Users\mattb\Documents\LocalGit\RFCD-Library\Test Rigs\SerialManagerTest\Debug\SerialManagerTest.exe
+  SerialManagerTest.vcxproj -> C:\Users\mattb\Documents\LocalGit\RFCD-Library\Test Rigs\SerialManagerTest\Debug\SerialManagerTest.pdb (Partial PDB)
