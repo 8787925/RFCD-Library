@@ -21,10 +21,8 @@ public:
 
 	DataPayload (uint8_t initialValue)
 	{
-		for (uint8_t i = 0; i<LENGTH; i++)
-		{
-			messageBytes_[i] =  initialValue;
-		}
+		defaultValue_ = initialValue;
+		this->defaultValues();
 	}
 
 
@@ -90,12 +88,26 @@ public:
 	}
 
 
+	//
+	//defaultValues()
+	//
+
+	void defaultValues()
+	{
+		for (uint8_t i = 0; i<LENGTH; i++)
+		{
+			messageBytes_[i] = defaultValue_;
+		}
+	}
+
+
 private:
 	//
 	//variables
 	//
 
 	uint8_t messageBytes_[LENGTH];
+	uint8_t defaultValue_;
 };
 
 #endif /* FOUNDATION_DATAPAYLOADKIT_H_ */
