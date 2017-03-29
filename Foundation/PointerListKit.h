@@ -142,7 +142,12 @@ public:
 		if (itterator_ < LENGTH)
 		{
 			itterator_++;
-			if (itterator_ >= LENGTH) //if this is the last entry
+			if (itterator_ >= this->used()) //if this is the last entry
+			{
+				*newLoop = true;
+			}
+
+			if (list_[itterator_-1] == 0) //if the entry is empty
 			{
 				*newLoop = true;
 			}
