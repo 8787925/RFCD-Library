@@ -12,9 +12,9 @@
 //Includes
 //
 
-#include "C:\Users\Jimmy\OneDrive\Documents\RFCD\MowerProject\config.h"
-#include "C:\Users\Jimmy\OneDrive\Documents\RFCD\Code Libraries\Foundation\Listener.h"
-#include "C:\Users\Jimmy\OneDrive\Documents\RFCD\Code Libraries\CANTypes.h"
+#include "config.h"
+#include "Foundation\Listener.h"
+#include "Hardware\CANTypes.h"
 
 //
 //Definition guarding

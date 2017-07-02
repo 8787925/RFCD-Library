@@ -5,7 +5,7 @@
  *      Author: Jimmy
  */
 
-#include "C:\Users\Jimmy\OneDrive\Documents\RFCD\Code Libraries\Hardware\CANdriver.h"
+#include "Hardware\CANdriver.h"
 #include <util/atomic.h>
 
 //
@@ -71,7 +71,7 @@ void CANhardware::setBaudRate(uint8_t baud)
 	}
 
 
-#include "C:\Users\Jimmy\OneDrive\Documents\RFCD\Code Libraries\CANHardwareClockSettings.h"
+#include "Hardware\CANHardwareClockSettings.h"
 
 
 	if (!initialized_)
