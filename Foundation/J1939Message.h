@@ -8,8 +8,8 @@
 #ifndef J1939MESSAGE_H_
 #define J1939MESSAGE_H_
 
-#include "CANMessage.h"
-#include "C:\Users\Jimmy\OneDrive\Documents\RFCD\Code Libraries\Foundation\Thread.h" //DELETE THIS, TRIAL ONLY
+#include "Foundation\CANMessage.h"
+#include "Foundation\Thread.h" //DELETE THIS, TRIAL ONLY
 
 class J1939Message: public CANMessage, public Thread
 {public:
@@ -62,6 +62,7 @@ class J1939Message: public CANMessage, public Thread
 	void setPDUSpecific(uint8_t pduSpecific);
 	uint8_t setPDUSpecific(){return (0x0F & pgn_);};
 
+
 private:
 	//
 	//updateIdentity()
@@ -75,6 +76,7 @@ private:
 	//
 
 	uint8_t sa_;
+	uint8_t da_;
 	uint8_t priority_;
 	uint32_t pgn_;
 };
