@@ -8,7 +8,7 @@
 #ifndef APPLICATION_2DLOOKUPTABLE_H_
 #define APPLICATION_2DLOOKUPTABLE_H_
 
-#include "C:\Users\Jimmy\OneDrive\Documents\RFCD\Code Libraries\Foundation\BiLinearInterpolation.h"
+#include "Foundation\BiLinearInterpolation.h"
 
 template <const uint8_t Rows, const uint8_t Columns, class IndexType, class TableType, class ReturnType>
 

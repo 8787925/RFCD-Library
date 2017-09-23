@@ -8,7 +8,7 @@
 #ifndef APPLICATION_1DLOOKUPTABLE_H_
 #define APPLICATION_1DLOOKUPTABLE_H_
 
-#include "C:\Users\Jimmy\OneDrive\Documents\RFCD\Code Libraries\Foundation\LinearInterpolation.h"
+#include "Foundation\LinearInterpolation.h"
 
 
 template <const uint8_t Indecies, class IndexType, class TableType, class ReturnType>
