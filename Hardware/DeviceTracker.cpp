@@ -46,15 +46,15 @@ bool devicePortUse::checkOut(Ports checkThisPort){
 		return false;
 	}
 
-	staticPortsCheckout_.Port_A |= checkThisPort.Port_A;
-	staticPortsCheckout_.Port_B |= checkThisPort.Port_B;
+	staticPortsCheckout_ |= checkThisPort;
+	/*staticPortsCheckout_.Port_B |= checkThisPort.Port_B;
 	staticPortsCheckout_.Port_C |= checkThisPort.Port_C;
 	staticPortsCheckout_.Port_D |= checkThisPort.Port_D;
 	staticPortsCheckout_.Port_E |= checkThisPort.Port_E;
 	staticPortsCheckout_.Port_F |= checkThisPort.Port_F;
 	staticPortsCheckout_.Port_G |= checkThisPort.Port_G;
 	staticPortsCheckout_.Port_H |= checkThisPort.Port_H;
-	staticPortsCheckout_.Port_I |= checkThisPort.Port_I;
+	staticPortsCheckout_.Port_I |= checkThisPort.Port_I;*/
 
 	return true;
 }
@@ -65,15 +65,15 @@ bool devicePortUse::checkOut(Ports checkThisPort){
 //
 
 void devicePortUse::checkIn(Ports checkThisPort){
-	staticPortsCheckout_.Port_A &= ~(checkThisPort.Port_A);
-	staticPortsCheckout_.Port_B &= ~(checkThisPort.Port_B);
+	staticPortsCheckout_ &= ~(checkThisPort);
+	/*staticPortsCheckout_.Port_B &= ~(checkThisPort.Port_B);
 	staticPortsCheckout_.Port_C &= ~(checkThisPort.Port_C);
 	staticPortsCheckout_.Port_D &= ~(checkThisPort.Port_D);
 	staticPortsCheckout_.Port_E &= ~(checkThisPort.Port_E);
 	staticPortsCheckout_.Port_F &= ~(checkThisPort.Port_F);
 	staticPortsCheckout_.Port_G &= ~(checkThisPort.Port_G);
 	staticPortsCheckout_.Port_H &= ~(checkThisPort.Port_H);
-	staticPortsCheckout_.Port_I &= ~(checkThisPort.Port_I);
+	staticPortsCheckout_.Port_I &= ~(checkThisPort.Port_I);*/
 
 	//staticPortsCheckout_ = (staticPortsCheckout_ & (~checkThisPort));//no idea at all if this would work
 }

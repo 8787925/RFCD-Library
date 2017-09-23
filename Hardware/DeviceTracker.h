@@ -11,6 +11,13 @@
 #include <avr/io.h>
 #include <CANmessage.h>
 
+
+//
+// Ports
+//
+//defines the list of ports, representing 1 (in use) and 0 (not in use)
+//
+
 struct Ports{
 	uint8_t Port_A;
 	uint8_t Port_B;
@@ -22,6 +29,68 @@ struct Ports{
 	uint8_t Port_H;
 	uint8_t Port_I;
 };
+
+//
+//Operator Overloading for Ports
+//
+
+Ports operator |= (Ports& lhs, Ports& rhs)
+{	Ports local;
+	local.Port_A = (lhs.Port_A | rhs.Port_A);
+	local.Port_B = (lhs.Port_B | rhs.Port_B);
+	local.Port_C = (lhs.Port_C | rhs.Port_C);
+	local.Port_D = (lhs.Port_D | rhs.Port_D);
+	local.Port_E = (lhs.Port_E | rhs.Port_E);
+	local.Port_F = (lhs.Port_F | rhs.Port_F);
+	local.Port_G = (lhs.Port_G | rhs.Port_G);
+	local.Port_H = (lhs.Port_H | rhs.Port_H);
+	local.Port_I = (lhs.Port_I | rhs.Port_I);
+	return local;
+}
+
+Ports operator &= (Ports& lhs, Ports& rhs)
+{	Ports local;
+	local.Port_A = (lhs.Port_A & rhs.Port_A);
+	local.Port_B = (lhs.Port_B & rhs.Port_B);
+	local.Port_C = (lhs.Port_C & rhs.Port_C);
+	local.Port_D = (lhs.Port_D & rhs.Port_D);
+	local.Port_E = (lhs.Port_E & rhs.Port_E);
+	local.Port_F = (lhs.Port_F & rhs.Port_F);
+	local.Port_G = (lhs.Port_G & rhs.Port_G);
+	local.Port_H = (lhs.Port_H & rhs.Port_H);
+	local.Port_I = (lhs.Port_I & rhs.Port_I);
+	return local;
+}
+
+bool operator == (Ports& lhs, Ports& rhs)
+{	int local;
+	local |= (lhs.Port_A & rhs.Port_A);
+	local |= (lhs.Port_B & rhs.Port_B);
+	local |= (lhs.Port_C & rhs.Port_C);
+	local |= (lhs.Port_D & rhs.Port_D);
+	local |= (lhs.Port_E & rhs.Port_E);
+	local |= (lhs.Port_F & rhs.Port_F);
+	local |= (lhs.Port_G & rhs.Port_G);
+	local |= (lhs.Port_H & rhs.Port_H);
+	local |= (lhs.Port_I & rhs.Port_I);
+	return (local > 0);
+}
+
+Ports operator ~ (Ports& lhs)
+{	Ports local;
+	local.Port_A = ~lhs.Port_A;
+	local.Port_B = ~lhs.Port_B;
+	local.Port_C = ~lhs.Port_C;
+	local.Port_D = ~lhs.Port_D;
+	local.Port_E = ~lhs.Port_E;
+	local.Port_F = ~lhs.Port_F;
+	local.Port_G = ~lhs.Port_G;
+	local.Port_H = ~lhs.Port_H;
+	local.Port_I = ~lhs.Port_I;
+	return local;
+}
+
+
 
 typedef uint32_t MOBregister;
 
@@ -101,6 +170,7 @@ class devicePortUse{
 
 	Ports getRegister();
 	
+
 	private:
 	
 	devicePortUse();
