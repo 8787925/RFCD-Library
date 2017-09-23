@@ -1,5 +1,5 @@
 ﻿
-#include <C:\Users\Jimmy\OneDrive\Documents\Atmel Studio\6.1\GPS_spedometer\eeprom_management.h>
+#include <eeprom_management.h>
 #include <avr/eeprom.h>
 
 //
