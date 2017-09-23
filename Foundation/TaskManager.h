@@ -9,33 +9,13 @@
 #define FOUNDATION_TASKMANAGER_H_
 
 #include <avr/io.h>
-#include <C:\Users\Jimmy\OneDrive\Documents\RFCD\Code Libraries\Foundation\TaskBlock.h>
+#include <Foundation\TaskBlock.h>
 
 #define FOREGROUND_TASKS 3
 #define BACKGROUND_TASK 1
 #define MAXTASKS (FOREGROUND_TASKS + BACKGROUND_TASK)
 
 //#define INCLUDE_BACKGROUND_TASK 1
-
-enum TaskPriority{
-	INTERRUPT,
-	HIGH,
-	MEDIUM,
-	REGULAR,
-	LOW
-};
-
-enum TaskPeriod_us{
-	ONEmsTASK=1000,
-	TWOmsTASK=2000,
-	FIVEmsTASK=5000,
-	TENmsTASK=10000,
-	TWENTYmsTASK=20000,
-	FIFTYmsTASK = 50000,
-	HUNDREDmsTASK=100000,
-	ONEsTASK=1000000,
-	BACKGROUND=1000001
-};
 
 
 class TaskBlock; //forward Declaration

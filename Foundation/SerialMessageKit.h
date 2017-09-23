@@ -42,7 +42,7 @@ public:
 		messageDirection_ = direction;
 		sending_ = false;
 		recieving_ = false;
-		if ((direction == RXonly) || (direction == BOTH))
+		if ((direction == serial_RXonly) || (direction == serial_BOTH))
 		{
 			this->enableRecieve();
 		}

@@ -8,6 +8,9 @@
 #ifndef FOUNDATION_POINTERLISTKIT_H_
 #define FOUNDATION_POINTERLISTKIT_H_
 
+#ifndef __STDINT_H_
+#include "Application\TestAdapter.h"
+#endif
 
 template <class T, const uint8_t LENGTH>
 
@@ -142,7 +145,7 @@ public:
 		if (itterator_ < LENGTH)
 		{
 			itterator_++;
-			if (itterator_ >= this->used()) //if this is the last entry
+			if ((itterator_) >= this->used()) //if this is the last entry
 			{
 				*newLoop = true;
 			}
