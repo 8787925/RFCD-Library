@@ -9,7 +9,8 @@
 #define PID_KIT_H_
 
 //#include <C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1056\avr8-gnu-toolchain\avr\include\stdint.h>
-#include <C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1056\avr8-gnu-toolchain\avr\include\math.h>
+//#include <C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1056\avr8-gnu-toolchain\avr\include\math.h>
+#include <math.h>
 //#include <C:\Users\Jimmy\OneDrive\Documents\RFCD\Code Libraries\Application\Sensor.h>
 //#include <C:\Users\Jimmy\OneDrive\Documents\RFCD\Code Libraries\Timer.h>
 //#include <avr/include/math.h>
