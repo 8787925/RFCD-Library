@@ -13,9 +13,9 @@
 
 enum txOrRx
 {
-	TXonly,
-	RXonly,
-	BOTH
+	serial_TXonly,
+	serial_RXonly,
+	serial_BOTH
 };
 
 enum serialPayloadType

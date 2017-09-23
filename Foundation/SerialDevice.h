@@ -38,9 +38,9 @@ public:
 	//constructor
 	//
 
-	SerialDevice()
+	SerialDevice(): rollingIdentity(0), rxDataBuffer(60)
 	{
-		//clientRxMessageIdentifier_ = 0;
+		clientRxMessageIdentifier_ = 0;
 		enabled_ = false;
 		transmitting_ = false;
 		clientRxMessageIdentifier_ = 0;
@@ -257,11 +257,11 @@ private:
 	bool transmitting_;
 	bool recieving_, streamIsNew_;
 	bool enabled_;
-	VariableList<SERIAL_IDENTIFIER_LENGTH, uint8_t> rollingIdentity = VariableList<SERIAL_IDENTIFIER_LENGTH, uint8_t> (0);
+	VariableList<SERIAL_IDENTIFIER_LENGTH, uint8_t> rollingIdentity;// = VariableList<SERIAL_IDENTIFIER_LENGTH, uint8_t> (0);
 	uint8_t temporaryIdentity_[SERIAL_IDENTIFIER_LENGTH];
 	uint8_t incomingPayloadCount_;
 	SerialIdentifier<SERIAL_IDENTIFIER_LENGTH> * clientRxMessageIdentifier_;
-	DataPayload<60> rxDataBuffer = DataPayload<60> (60);
+	DataPayload<60> rxDataBuffer;
 
 
 };
