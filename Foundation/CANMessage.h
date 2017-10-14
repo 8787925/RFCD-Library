@@ -8,9 +8,9 @@
 #ifndef CANMESSAGE_H_
 #define CANMESSAGE_H_
 
-#include "C:\Users\Jimmy\OneDrive\Documents\RFCD\Code Libraries\Hardware\CANdriver.h"
-#include "C:\Users\Jimmy\OneDrive\Documents\RFCD\Code Libraries\Foundation\Listener.h"
-#include "C:\Users\Jimmy\OneDrive\Documents\RFCD\Code Libraries\CANTypes.h"
+#include "Hardware\CANdriver.h"
+#include "Foundation\Listener.h"
+#include "Hardware\CANTypes.h"
 
 class CANMessage: public Listener
 {
