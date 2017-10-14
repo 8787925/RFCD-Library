@@ -12,6 +12,23 @@
 #include "Application\TestAdapter.h"
 #endif
 
+#define POINTER_flag_EMPTY_position 3
+#define POINTER_flag_ROLLING_position 2
+#define POINTER_flag_EOL_position 1
+#define POINTER_flag_SOL_position 0
+
+#define POINTER_flagACT_SOL_position 4
+#define POINTER_flagACT_ROLL_position 5
+
+#define POINTER_stat_ROLLING (1<< POINTER_flag_ROLLING_position)
+#define POINTER_stat_EOL (1<< POINTER_flag_EOL_position)
+#define POINTER_stat_SOL (1<< POINTER_flag_SOL_position)
+#define POINTER_stat_LISTEMPTY (1<< POINTER_flag_EMPTY_position)
+
+#define POINTER_act_SOL (1<<POINTER_flagACT_SOL_position)
+#define POINTER_act_ROLL (1<< POINTER_flagACT_ROLL_position)
+
+
 template <class T, const uint8_t LENGTH>
 
 class PointerList
@@ -24,7 +41,7 @@ public:
 	PointerList()
 	{
 		listFree_ = LENGTH;
-		itterator_ = 0;
+		iterator_ = 0;
 		listSize_ = listFree_;
 
 		for (int i = 0; i<LENGTH; i++)
@@ -131,31 +148,64 @@ public:
 
 
 	//
-	//itterate()
+	//iterate()
 	//
 
-	T* itterate(bool* newLoop)
+	T* iterate(uint8_t* listStatus)
+	{
+		if (*listStatus & POINTER_act_SOL) //if client requests to start from list beginning
+		{
+			iterator_ = 1;
+		}
+		else
+		{
+			iterator_ ++;
+		}
+
+
+		if (iterator_ == LENGTH) //wrap to the beginning of the list if the end
+		{
+			iterator_ = 1;
+		}
+
+		switch (iterator_)
+		{
+			case (LENGTH): //end of the list has been hit
+					*listStatus |= POINTER_stat_EOL;
+					break;
+
+			case (1): //start of the list is hit
+					*listStatus |= POINTER_stat_SOL;
+					break;
+		}
+
+		*listStatus &= 0x0F; //clear the action flags
+
+		return list_[iterator_-1];
+	}
+
+	T* iterate(bool* newLoop)
 	{
 		if ( *newLoop)
 		{
-			itterator_ = 0;
+			iterator_ = 0;
 			*newLoop = false;
 		}
 
-		if (itterator_ < LENGTH)
+		if (iterator_ < LENGTH)
 		{
-			itterator_++;
-			if ((itterator_) >= this->used()) //if this is the last entry
+			iterator_++;
+			if ((iterator_) >= this->used()) //if this is the last entry
 			{
 				*newLoop = true;
 			}
 
-			if (list_[itterator_-1] == 0) //if the entry is empty
+			if (list_[iterator_-1] == 0) //if the entry is empty
 			{
 				*newLoop = true;
 			}
 
-			return list_[itterator_-1];
+			return list_[iterator_-1];
 		}
 
 		*newLoop = true;
@@ -231,7 +281,7 @@ private:
 	//variables
 	//
 
-	uint8_t listSize_, itterator_, listFree_;
+	uint8_t listSize_, iterator_, listFree_;
 	T* list_[LENGTH];
 };
 
