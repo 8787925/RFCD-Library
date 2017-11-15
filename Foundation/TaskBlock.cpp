@@ -134,7 +134,7 @@ void TaskBlock::add(Thread* thread_)
 	uint8_t i =0;
 	for (i=0; i<MAXTHREADS; i++)
 	{
-		if (threadList_[i] == 0) //if it is not a null pointer
+		if (threadList_[i] == 0) //if the list position has 'null' in it, it's good to have new data inserted
 		{
 			threadList_[i] = thread_;
 			return;
