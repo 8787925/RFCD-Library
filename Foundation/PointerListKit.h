@@ -12,18 +12,23 @@
 #include "Application\TestAdapter.h"
 #endif
 
+#define POINTER_flag_SUCCESS_position 5
+#define POINTER_flag_FULL_position 4
 #define POINTER_flag_EMPTY_position 3
 #define POINTER_flag_ROLLING_position 2
 #define POINTER_flag_EOL_position 1
 #define POINTER_flag_SOL_position 0
 
-#define POINTER_flagACT_SOL_position 4
-#define POINTER_flagACT_ROLL_position 5
+#define POINTER_flagACT_SOL_position 6
+#define POINTER_flagACT_ROLL_position 7
 
 #define POINTER_stat_ROLLING (1<< POINTER_flag_ROLLING_position)
 #define POINTER_stat_EOL (1<< POINTER_flag_EOL_position)
 #define POINTER_stat_SOL (1<< POINTER_flag_SOL_position)
 #define POINTER_stat_LISTEMPTY (1<< POINTER_flag_EMPTY_position)
+#define POINTER_stat_LISTFULL (1<< POINTER_flag_FULL_position)
+#define POINTER_stat_SUCCESS (1<< POINTER_flag_SUCCESS_position)
+#define POINTER_stat_FAILURE 0
 
 #define POINTER_act_SOL (1<<POINTER_flagACT_SOL_position)
 #define POINTER_act_ROLL (1<< POINTER_flagACT_ROLL_position)
@@ -67,7 +72,17 @@ public:
 
 	uint8_t used()
 	{
-		return LENGTH - listFree_;
+		return LENGTH - this->listFree_;
+	}
+
+
+	//
+	//free()
+	//
+
+	uint8_t free()
+	{
+		return this->listFree_;
 	}
 
 
@@ -75,17 +90,17 @@ public:
 	//add(T*)
 	//
 
-	bool add(T* value)
+	uint8_t add(T* value)
 	{
-		bool success = false;
+		uint8_t success = false;
 
 		for (int i = 0; i<LENGTH; i++)
 		{
 			if ((list_[i] == 0) || (list_[i] == value))
 			{
 				list_[i] = value;
-				success = true;
-				listFree_--;
+				success = POINTER_stat_SUCCESS;
+				this->claimFromFree();
 				break;
 			}
 		}
@@ -98,15 +113,14 @@ public:
 	//addToTop(T*)
 	//
 
-	bool addToTop(T* value)
+	uint8_t addToTop(T* value)
 	{
-		bool success = false;
+		uint8_t success = false;
 
 		if (list_[LENGTH-1] == 0)
 		{
 			this->deleteShiftDown(LENGTH-1);
 			success = this->add(value);
-			listFree_--;
 		}
 
 		return success;
@@ -117,9 +131,9 @@ public:
 	//remove(T*)
 	//
 
-	bool remove(T* value)
+	uint8_t remove(T* value)
 	{
-		bool success = false;
+		uint8_t success = false;
 
 		for (int i = 0; i<LENGTH; i++)
 		{
@@ -127,8 +141,7 @@ public:
 			{
 				list_[i] = 0;
 				this->deleteShiftUp(i);
-				success = true;
-				listFree_++;
+				success = POINTER_stat_SUCCESS;
 				break;
 			}
 		}
@@ -230,6 +243,53 @@ public:
 	}
 
 
+	//
+	//insert(T*, uint8_t)
+	//
+	//inserts at the position handed in the integer, shifting list down
+	//returns a value indicating list status
+	//Will fail to insert if the list is full
+	//
+
+	uint8_t insert(T* pointer, uint8_t position)
+	{
+		T* localCopyVariable, loadedPointer;
+		localCopyVariable = 0;
+		loadedPointer = pointer;
+
+		if (this->listFree_ < 1) //if the list isn't already full
+		{
+			return POINTER_stat_LISTFULL;
+		}
+		else
+		{	//the list is not full yet
+			if (this->get(position) != 0) //if there's something in that position of the list
+			{
+				if (position < LENGTH-1) //if we're not attempting an overflow
+				{
+					//for the whole list between LENGTH and 'position', shift everything down to accomodate the new pointer
+					for (int i = position; i < (LENGTH); i++)
+					{
+						localCopyVariable = this->get(i); //copy the current contents of the target position
+						this->list_[i] = loadedPointer;
+						loadedPointer = localCopyVariable;
+					}
+					this->claimFromFree();
+					return POINTER_stat_SUCCESS;
+				}
+				else
+				{
+					return POINTER_stat_FAILURE; //FAILURE
+				}
+			}
+			else
+			{	//there's nothing in that position of the list and it can be written
+				this->list_[position] = pointer;
+				return POINTER_stat_SUCCESS;
+			}
+		}
+	}
+
 private:
 	//
 	//deleteShiftUp(uint8_t)
@@ -250,6 +310,7 @@ private:
 					list_[i] = 0;
 				}
 			}
+			this->makeFree();
 		}
 	}
 
@@ -273,6 +334,35 @@ private:
 					list_[i] = 0;
 				}
 			}
+			this->makeFree();
+		}
+	}
+
+
+	//
+	//claimFromFree();
+	//
+	//adds to the 'stored' integer of the list, making one less in the 'free' count
+	//
+
+	void claimFromFree()
+	{
+		if (this->listFree_ > 0)
+		{
+			this->listFree_ --;
+		}
+	}
+
+
+	//
+	//makeFree()
+	//
+
+	void makeFree()
+	{
+		if (this->listFree_ < this->listSize_)
+		{
+			this->listFree_++;
 		}
 	}
 
