@@ -19,6 +19,8 @@
 #define POINTER_flag_EOL_position 1
 #define POINTER_flag_SOL_position 0
 
+//todo add a macro to clear flags and to clear statuses, you already fucked this up once
+
 #define POINTER_flagACT_SOL_position 6
 #define POINTER_flagACT_ROLL_position 7
 
@@ -26,7 +28,7 @@
 #define POINTER_stat_EOL (1<< POINTER_flag_EOL_position)
 #define POINTER_stat_SOL (1<< POINTER_flag_SOL_position)
 #define POINTER_stat_LISTEMPTY (1<< POINTER_flag_EMPTY_position)
-#define POINTER_stat_LISTFULL (1<< POINTER_flag_FULL_position)
+#define POINTER_stat_LISTFULL (1 << POINTER_flag_FULL_position)
 #define POINTER_stat_SUCCESS (1<< POINTER_flag_SUCCESS_position)
 #define POINTER_stat_FAILURE 0
 
@@ -105,6 +107,10 @@ public:
 			}
 		}
 
+		if (this->free() == 0)
+		{
+			success |= POINTER_stat_LISTFULL;
+		}
 		return success;
 	}
 
@@ -146,6 +152,11 @@ public:
 			}
 		}
 
+		if (this->used() == 0) //flag if the list is empty
+		{
+			success |= POINTER_stat_LISTEMPTY;
+		}
+
 		return success;
 	}
 
@@ -154,9 +165,14 @@ public:
 	//deleteFirst()
 	//
 
-	void deleteFirst()
+	uint8_t deleteFirst()
 	{
 		this->deleteShiftUp(0);
+
+		if (this->used() == 0 ) // flag if the list is empty
+		{
+			return POINTER_stat_LISTEMPTY;
+		}
 	}
 
 
@@ -176,7 +192,7 @@ public:
 		}
 
 
-		if (iterator_ == LENGTH) //wrap to the beginning of the list if the end
+		if (iterator_ == (LENGTH+1)) //wrap to the beginning of the list if the end
 		{
 			iterator_ = 1;
 		}
@@ -184,12 +200,18 @@ public:
 		switch (iterator_)
 		{
 			case (LENGTH): //end of the list has been hit
+					*listStatus &= 0xF0;
 					*listStatus |= POINTER_stat_EOL;
 					break;
 
 			case (1): //start of the list is hit
+					*listStatus &= 0xF0;
 					*listStatus |= POINTER_stat_SOL;
 					break;
+
+			default: //neither the beginning nor the end of the list
+					*listStatus &= 0xF0;
+					*listStatus |= POINTER_stat_ROLLING;
 		}
 
 		*listStatus &= 0x0F; //clear the action flags
@@ -253,7 +275,8 @@ public:
 
 	uint8_t insert(T* pointer, uint8_t position)
 	{
-		T* localCopyVariable, loadedPointer;
+		T* localCopyVariable;
+		T* loadedPointer;
 		localCopyVariable = 0;
 		loadedPointer = pointer;
 
