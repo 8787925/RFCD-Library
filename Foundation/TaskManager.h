@@ -39,13 +39,6 @@ public:
 
 
 	//
-	//callBackgroundTask()
-	//
-
-	void callBackgroundTask();
-
-
-	//
 	//addPeriodic(TaskBlock&)
 	//
 

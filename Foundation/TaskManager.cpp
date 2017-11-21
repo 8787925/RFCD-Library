@@ -68,16 +68,6 @@ void TaskManager::addPeriodic(TaskBlock* taskBlock)
 
 
 //
-//callBackgroundTask()
-//
-
-void TaskManager::callBackgroundTask()
-{
-
-}
-
-
-//
 //decrementAllCounts()
 //
 
