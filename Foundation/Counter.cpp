@@ -44,12 +44,12 @@ Counter::Counter(uint64_t CounterResetValue, CounterDirection Direction,
 	enabled_ = true;
 
 	if (direction_ == COUNT_UP)
-	{
+	{//is count up timer
 		trueOnThisValue_ = resetValue_;
 		currentCount_ = 0;
 	}
 	else
-	{
+	{//is count down timer
 		trueOnThisValue_ = 0;
 		currentCount_ = resetValue_;
 	}
@@ -168,11 +168,11 @@ void Counter::update(uint64_t CounterResetValue)
 		}
 	}
 	else
-	{
+	{//is count down
 		trueOnThisValue_ = 0;
 		//currentCount_ = resetValue_;
-		if (currentCount_ > resetValue_)
-		{
+		if (currentCount_ > resetValue_) //maintains the current count's scheduled arrival if possible
+		{//the current count is bigger than our new counter size
 			currentCount_ = resetValue_;
 			//this->forceCompare();
 		}
