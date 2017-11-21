@@ -8,25 +8,41 @@
 #ifndef FOUNDATION_TASKMANAGER_H_
 #define FOUNDATION_TASKMANAGER_H_
 
-#include <avr/io.h>
-#include <Foundation\TaskBlock.h>
+#ifndef UNIT_TESTING
+	#include <avr/io.h>
+#endif
 
-#define FOREGROUND_TASKS 3
-#define BACKGROUND_TASK 1
+#include <Foundation\TaskBlock.h>
+#include <Foundation\SortedPointerListKit.h>
+
+#ifndef FOREGROUND_TASKS
+	#define FOREGROUND_TASKS 3
+#endif
+
+#ifndef BACKGROUND_TASK
+	#define BACKGROUND_TASK 1
+#endif
+
 #define MAXTASKS (FOREGROUND_TASKS + BACKGROUND_TASK)
 
 //#define INCLUDE_BACKGROUND_TASK 1
 
 
-class TaskBlock; //forward Declaration
-
-class TaskManager {
+class TaskManager: public SortedList <MAXTASKS, TaskBlock, TaskPeriod_us>
+{
 public:
 	//
 	//instance()
 	//
 
 	static TaskManager* instance();
+
+
+	//
+	//callBackgroundTask()
+	//
+
+	void callBackgroundTask();
 
 
 	//
@@ -46,13 +62,6 @@ public:
 
 
 	//
-	//remove(TaskBlock&)
-	//
-
-	void remove(TaskBlock* taskblock);
-
-
-	//
 	//addSporatic(TaskBlock&, uint8_t);
 	//
 
@@ -66,21 +75,6 @@ public:
 	void callOnPrincipleInterval();
 
 private:
-
-	//
-	//insertTaskToQue(TaskBlock&)
-	//
-
-	void insertTaskToQue(TaskBlock* task);
-
-
-	//
-	//removeTaskFromQue(TaskBlock*)
-	//
-
-	void removeTaskFromQue(TaskBlock* task);
-
-
 	//
 	//decrementAllCounts()
 	//
@@ -101,9 +95,6 @@ private:
 
 	TaskManager();
 
-	uint16_t callTicks_; //acting as the RTC, reveals the number of calls/principle ticks of the task manager
-	TaskBlock* taskBlockList_[MAXTASKS];
-	TaskBlock* taskBlockQue_[MAXTASKS];
 	bool interruptArbitrationRequired_;
 };
 

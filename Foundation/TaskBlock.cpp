@@ -9,24 +9,43 @@
 
 #include "Foundation\TaskManager.h"
 
+
+//
+//executeIfReady()
+//
+
+void TaskBlock::executeIfReady()
+{
+	if (readyToRun_)
+	{
+		this->executeList();
+		cout << "exifready " << this->taskPeriod_ << endl;
+	}
+}
+
+
 //
 //executeList()
 //
 
 void TaskBlock::executeList()
 {
-	uint8_t i =0;
+	bool listExecution;
 	interrupted_=false;
 	readyToRun_=false;
 
-	if (isRunning_){PORTB^=(1<<6); }
-	for (i=0; i<MAXTHREADS; i++)
+	//if (isRunning_){PORTB^=(1<<6);} debug flagging
+
+	isRunning_ = true;
+	listExecution = true; //flag to begin at the top of the iteration list
+
+	if (this->used() > 0) //guard against attempted execution of an empty list
 	{
-		if ((threadList_[i] != 0))//if it is not a null pointer
+		do
 		{
-			isRunning_=true;
-			threadList_[i]->run();
-		}
+			this->iterate(&listExecution)->run();
+
+		}while (!listExecution); //wait for 'true' to be returned, indicating a complete list execution
 	}
 
 	isRunning_=false;
@@ -100,7 +119,7 @@ bool TaskBlock::isInterrupted()
 //
 //decrementCountsBeforeNextRun()
 //
-
+/*
 bool TaskBlock::decrementCountsBeforeNextRun()
 {
 	remainingCountBeforeRun_--; //decrement by a count
@@ -111,7 +130,7 @@ bool TaskBlock::decrementCountsBeforeNextRun()
 		remainingCountBeforeRun_=countsBetweenRuns_;
 		if (isRunning_)
 		{
-			PORTB ^= (1<<7);
+			//PORTB ^= (1<<7); debug flagging
 			////task has overrun #TODO add overrun flag registry
 		}
 		readyToRun_=true;
@@ -122,13 +141,13 @@ bool TaskBlock::decrementCountsBeforeNextRun()
 		//it is not time to run
 		return false;
 	}
-}
+}*/
 
 
 //
 //add(Thread&)
 //
-
+/*
 void TaskBlock::add(Thread* thread_)
 {
 	uint8_t i =0;
@@ -140,13 +159,13 @@ void TaskBlock::add(Thread* thread_)
 			return;
 		}
 	}
-}
+}*/
 
 
 //
 //remove(Thread&)
 //
-
+/*
 void TaskBlock::remove(Thread* thread_)
 {
 	uint8_t i =0;
@@ -159,7 +178,7 @@ void TaskBlock::remove(Thread* thread_)
 	}
 
 	//this->reSortList();
-}
+}*/
 
 
 //
@@ -175,11 +194,11 @@ void TaskBlock::reSortList()
 //
 //getPriority();
 //
-
+/*
 TaskPriority TaskBlock::getPriority()
 {
 	return taskPriority_;
-}
+}*/
 
 
 //
@@ -188,41 +207,37 @@ TaskPriority TaskBlock::getPriority()
 
 uint8_t TaskBlock::getNumberOfThreads()
 {
-	uint8_t threadCount = 0;
-	uint8_t i =0;
 
-	for (i=0; i<MAXTHREADS; i++)
-	{
-		if (threadList_[i] != 0 ) //if it is not a null pointer
-		{
-			threadCount++;
-		}
-	}
-
-	return threadCount;
+	return this->used();
 }
 
+
+//
+//listenerEvent()
+//
+
+void TaskBlock::listenerEvent() //called at the expiration of the 'counter'
+{
+	readyToRun_ = true;
+}
 
 //
 //constructor(uint16_t)
 //
 
-TaskBlock::TaskBlock(TaskPeriod_us countBetweenRuns,TaskPriority priority)
+TaskBlock::TaskBlock(TaskPeriod_us countBetweenRuns,TaskPriority priority):Counter(this, 10000, COUNT_DOWN, WRAPPED) //counter is given artifical high value until guards are in place in constructor
 {
 	taskPeriod_=countBetweenRuns;
-	countsBetweenRuns_=((uint16_t)taskPeriod_)/RTC_PERIOD_USECONDS;
+	ticksBetweenRuns_=((uint16_t)taskPeriod_)/RTC_PERIOD_USECONDS;
 
-	if (!countsBetweenRuns_) //IF the count between runs is 0, then define it as 1 (meaning the between runs count rounds down to 0 at initialization)
+	if (!ticksBetweenRuns_) //IF the count between runs is 0, then define it as 1 (meaning the between runs count rounds down to 0 at initialization)
 	{
-		countsBetweenRuns_=1;//task period cannot be zero through math errors
+		ticksBetweenRuns_=1;//task period cannot be zero through math errors
 	}
-	int i = 0;
-	for (i=0; i<MAXTHREADS; i++)
-	{
-		threadList_[i] = 0;
-	}
+
+	update(uint64_t (ticksBetweenRuns_)); //update the counter with the correct value once we've guarded against error values
+
 	taskPriority_ = priority;
-	remainingCountBeforeRun_ = countsBetweenRuns_;
 	holdTaskForInterruption_=false;
 	readyToRun_=false;
 	isRunning_=false;

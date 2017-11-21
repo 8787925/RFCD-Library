@@ -7,12 +7,18 @@
 
 #ifndef FOUNDATION_TASKBLOCK_H_
 #define FOUNDATION_TASKBLOCK_H_
-#include <avr/io.h>
+
+#ifndef UNIT_TESTING
+	#include <avr/io.h>
+#endif
+
 #define MAXTHREADS 5
 
 #include "config.h"
 #include "Foundation\Thread.h"
 #include "Foundation\RFCDTypes.h"
+#include "Foundation\PointerListKit.h"
+#include "Foundation\Counter.h"
 
 enum TaskPriority{
 	INTERRUPT,
@@ -22,7 +28,9 @@ enum TaskPriority{
 	LOW
 };
 
-enum TaskPeriod_us{
+typedef uint64_t TaskPeriod_us;
+
+enum TaskPeriod{
 	ONEmsTASK=1000,
 	TWOmsTASK=2000,
 	FIVEmsTASK=5000,
@@ -36,14 +44,30 @@ enum TaskPeriod_us{
 
 
 
-class TaskBlock
+class TaskBlock: public PointerList<Thread, MAXTHREADS>, private Listener, public Counter
 {
 public:
+	//
+	//executeIfReady()
+	//
+
+	void executeIfReady();
+
+
 	//
 	//executeList();
 	//
 
 	void executeList();
+
+
+	//
+	//listenerEvent()
+	//
+	//used to trigger the isReady_ boolean, once the timer has elapsed for the task
+	//
+
+	void listenerEvent();
 
 
 	//
@@ -64,7 +88,7 @@ public:
 	//getPriority();
 	//
 
-	TaskPriority getPriority();
+	//TaskPriority getPriority();  eliminated by addition of PointerList class
 
 
 	//
@@ -92,21 +116,21 @@ public:
 	//decrementCountsBeforeNextRun()
 	//
 
-	bool decrementCountsBeforeNextRun();
+	//bool decrementCountsBeforeNextRun(); no longer needed by adding Count class
 
 
 	//
 	//add(&Thread)
 	//
 
-	void add(Thread* thread_);
+	//void add(Thread* thread_); eliminated by addition of PointerList
 
 
 	//
 	//remove(&thread)
 	//
 
-	void remove(Thread* thread_);
+	//void remove(Thread* thread_); eliminated by addition of PointerList
 
 
 	//
@@ -130,7 +154,8 @@ public:
 	TaskBlock(TaskPeriod_us countBetweenRuns, TaskPriority priority);
 
 
-		
+	TaskPeriod_us taskPeriod_; //access is necessary for the task manager
+
 private:
 
 	//
@@ -139,15 +164,13 @@ private:
 
 	void reSortList();
 
-	Thread *threadList_[MAXTHREADS];
-	TaskPeriod_us taskPeriod_;
+
 	TaskPriority taskPriority_;
 	bool readyToRun_;
 	bool isRunning_;
 	bool interrupted_;
 	uint8_t pausedThread_;
-	uint16_t countsBetweenRuns_;
-	uint16_t remainingCountBeforeRun_;
+	uint16_t ticksBetweenRuns_;
 	bool holdTaskForInterruption_;
 	//TaskManager* SystemTaskManager_ = TaskManager::instance();
 
