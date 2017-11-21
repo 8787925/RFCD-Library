@@ -1,12 +1,14 @@
 /*
- * PWM.cpp
+ * HardwarePWM.cpp
  *
  *  Created on: Jun 25, 2015
  *      Author: Jimmy
  */
-#include "PWM.h"
-#include <C:\Users\Jimmy\OneDrive\Documents\RFCD\Code Libraries\Hardware\DeviceTracker.h>
+#include "Hardware\Hardware_PWM.h"
+
+#include <Hardware\DeviceTracker.h>
 #include <avr/io.h>
+
 #define __AVR_ATmega32M1__
 #define CLOCK_0_PRESCALE 1
 #define CLOCK_1_PRESCALE 1
@@ -16,7 +18,7 @@
 	//
 	//constructs by rounding up to the next nearest frequency possible
 
-	PWM::PWM(dacList newPWM, uSeconds period, bool squareFrequencyPWM){
+	HardwarePWM::HardwarePWM(dacList newPWM, uSeconds period, bool squareFrequencyPWM){
 		usingDutyCycle_ = true;
 		localOnTime_ = 0;
 		countsPerTop_=0xffff;
@@ -29,7 +31,7 @@
 		this->setupPWM(newPWM);
 	}
 
-	PWM::PWM(dacList newPWM, bool squareFrequencyPWM){
+	HardwarePWM::HardwarePWM(dacList newPWM, bool squareFrequencyPWM){
 		usingDutyCycle_ = true;
 		localOnTime_ = 0;
 		countsPerTop_=0xffff;
@@ -47,7 +49,7 @@
 	//setDutyCycle(float)
 	//
 
-	void PWM::setDutyCycle(float Percent){
+	void HardwarePWM::setDutyCycle(float Percent){
 		localRegisterValue_=uint32_t((Percent/100)*countsPerTop_);
 	}
 
@@ -56,7 +58,7 @@
 	//setuSecondsOn(uSeconds)
 	//
 
-	void PWM::setuSecondsOn(uSeconds onTime){
+	void HardwarePWM::setuSecondsOn(uSeconds onTime){
 
 		if (onTime > this->getPeriod()){ //if the time is longer than the period of the clock
 			localRegisterValue_ = 0xffff;
@@ -73,7 +75,7 @@
 	//
 	// responsible for setting up the new pwm object
 
-	void PWM::setupPWM(dacList PWM){
+	void HardwarePWM::setupPWM(dacList PWM){
 
 		Ports localPortCheckin;
 		localPortCheckin.Port_A = 0;
@@ -210,7 +212,7 @@
 	//genClockSetup(dacList PWM)
 	//
 
-	void PWM::genClockSetup(dacList Object){
+	void HardwarePWM::genClockSetup(dacList Object){
 
 		if ((Object == PWM1) || (Object == PWM2)){
 			TCCR0A |= (1<<WGM01) | (1<<WGM00);
@@ -252,7 +254,7 @@
 	//
 	//responsible for interacting with the DAC initializer to update the output
 
-	void PWM::localUpdate(dacList PWM){
+	void HardwarePWM::localUpdate(dacList PWM){
 
 		if (localRegisterValue_ != 0x80000000){//IF not fault value
 			switch (localHardware_){
@@ -282,6 +284,6 @@
 	//getPeriod()
 	//
 
-	uSeconds PWM::getPeriod(){
+	uSeconds HardwarePWM::getPeriod(){
 		return localPeriod_;
 	}
