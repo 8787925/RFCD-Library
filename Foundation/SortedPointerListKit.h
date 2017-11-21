@@ -36,6 +36,41 @@ public:
 
 
 	//
+	//used()
+	//
+
+	uint8_t used()
+	{
+		return pointerList_.used();
+	}
+
+
+	//
+	//free()
+	//
+
+	uint8_t free()
+	{
+		return pointerList_.free();
+	}
+
+
+	//
+	//iterate(*bool)
+	//
+
+	T_TYPE* iterate(bool* listStatus)
+	{
+		return pointerList_.iterate(listStatus);
+	}
+
+	T_TYPE* iterate(uint8_t* listStatus)
+	{
+		return pointerList_.iterate(listStatus);
+	}
+
+
+	//
 	//reSort()
 	//
 	//re-sorts the values in the list based on the current (referenced by pointer) values of 'PRIORITIES'
@@ -173,7 +208,7 @@ public:
 	//
 	//returns the priority of the pointer given, if available
 	//
-
+	//TODO ADD A SAFER WAY TO RETURN ERRORS
 	SORT_TYPE getPriority(T_TYPE* pointer)
 	{
 		SORT_TYPE returnValue = -1; //initialize to fault condition return
@@ -258,6 +293,7 @@ private:
 			if (priorityList_.get(i) == 0 || *priorityList_.get(i) >= *sortBy) //scalar 'or' prevents the use of .get() and a null return from get()
 			{
 				//insert the value, because all the remainder of the list is greater than this value
+
 				success = priorityList_.insert(sortBy, i);
 				success &= pointerList_.insert(pointer, i);
 
