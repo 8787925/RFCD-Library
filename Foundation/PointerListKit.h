@@ -179,6 +179,10 @@ public:
 	//
 	//iterate()
 	//
+	//returns the lists contents on iteration at a time as it's called.
+	//the 'listStatus' variables are modified to flag the end of a list or success
+	//WARNING: this can return a null pointer if the list is empty.
+	//
 
 	T* iterate(uint8_t* listStatus)
 	{
@@ -227,10 +231,10 @@ public:
 			*newLoop = false;
 		}
 
-		if (iterator_ < LENGTH)
+		if (iterator_ < LENGTH) //guard against over extension
 		{
 			iterator_++;
-			if ((iterator_) >= this->used()) //if this is the last entry
+			if ((iterator_) >= this->used()) //if this is the last entry, or possibly no entries are present
 			{
 				*newLoop = true;
 			}
@@ -308,6 +312,7 @@ public:
 			else
 			{	//there's nothing in that position of the list and it can be written
 				this->list_[position] = pointer;
+				this->claimFromFree();
 				return POINTER_stat_SUCCESS;
 			}
 		}
