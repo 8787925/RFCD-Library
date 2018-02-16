@@ -64,7 +64,10 @@ public:
 	//should be housed in higher classes, is called by faultUpdate in poll of whether the fault condition is currently true or false
 	//
 
-	virtual bool faultCondition();
+	virtual bool faultCondition() //always returns false unless overriden
+	{
+		return false;
+	}
 
 
 	//
@@ -92,8 +95,15 @@ public:
 	//sets the faultID of the class
 	//
 
-	void setFaultID(uint16_t faultID);
-	uint16_t getFaultID();
+	void setFaultID(uint16_t faultID)
+	{
+		faultID_ = faultID;
+	}
+
+	uint16_t getFaultID()
+	{
+		return faultID_;
+	}
 
 
 	//
@@ -102,7 +112,10 @@ public:
 	//enables or disables the bucket from both being filled and emptied
 	//
 
-	void enable(bool isEnabled);
+	void enable(bool isEnabled)
+	{
+		isEnabled_ = isEnabled;
+	}
 
 
 	//
@@ -122,13 +135,12 @@ private:
 	//
 
 	bool isEnabled_;
+	bool faultIsSet_;
 	uint16_t incrementBy_, decrementBy_;
 	uint16_t faultTriggerLevel_;
 	uint16_t faultID_;
 	bool isSticky_;
 	FaultAction* faultAction_;
-
-
 
 };
 
