@@ -5,7 +5,7 @@
  *      Author: Jimmy
  */
 
-#include "Hardware\CANdriver.h"
+#include "Hardware/CANdriver.h"
 #include <util/atomic.h>
 
 //
@@ -23,7 +23,7 @@ CANhardware* CANhardware::instance()
 //setBaudRate(uint8)
 //
 
-void CANhardware::setBaudRate(uint8_t baud)
+void CANhardware::setBaudRate(uint16_t baud)
 {
 	if ((baudRate_!= baud) || !initialized_)
 	{
@@ -43,7 +43,7 @@ void CANhardware::setBaudRate(uint8_t baud)
 	unsigned char mob;          // CREATE THE VARIABLE FOR LATER USE TO INDEX WHICH MOB IS BEING REFERENCED
 	if (!initialized_)
 	{
-		CANGCON = (1 << SWRES);     // Reset the CAN controller hardware and general registers.
+		Can_reset(); //CANGCON = (1 << SWRES);     // Reset the CAN controller hardware and general registers.
 	}
 	///////////////////////////	///////////////////////////	///////////////////////////
 
@@ -53,7 +53,7 @@ void CANhardware::setBaudRate(uint8_t baud)
 	{
 		for (mob = 0; mob < MAXIMUM_MOB; mob++)  //STEP THROUGH ALL THE MOB'S
 		{
-			CANPAGE = (mob << MOBNB0);  // Set the MOb number for each MOb (AINC=0 and INDX=0). - AUTO INCREMENT SET TO 0, AND THE INDEX IS SET TO 0 AUTOMATICALLY AT A NEW CANPAGE CALL
+			Can_set_mob(mob); //CANPAGE = (mob << MOBNB0);  // Set the MOb number for each MOb (AINC=0 and INDX=0). - AUTO INCREMENT SET TO 0, AND THE INDEX IS SET TO 0 AUTOMATICALLY AT A NEW CANPAGE CALL
 			CANSTMOB = 0x00;            // CLEAR ALL THE STATUS FLAGS FOR EACH OF THE 14 MOBS
 		}
 	}
@@ -61,7 +61,7 @@ void CANhardware::setBaudRate(uint8_t baud)
 	{
 		for (mob = 0; mob < MAXIMUM_MOB; mob++)  //STEP THROUGH ALL THE MOB'S
 		{
-			CANPAGE = (mob << MOBNB0);  // Set the MOb number for each MOb (AINC=0 and INDX=0). - AUTO INCREMENT SET TO 0, AND THE INDEX IS SET TO 0 AUTOMATICALLY AT A NEW CANPAGE CALL
+			Can_set_mob(mob); //CANPAGE = (mob << MOBNB0);  // Set the MOb number for each MOb (AINC=0 and INDX=0). - AUTO INCREMENT SET TO 0, AND THE INDEX IS SET TO 0 AUTOMATICALLY AT A NEW CANPAGE CALL
 			this->insertData(0,mob,0);
 			this->setIdentity(0,mob);
 			this->setMask(UINT32_MAX,mob);
@@ -84,7 +84,7 @@ void CANhardware::setBaudRate(uint8_t baud)
 
 		///////////////////////////	///////////////////////////	///////////////////////////
 		// USE THIS SECTION OF THE CODE TO CONFIGURE THE MOB OF THE RECEIVE MULE OF THE SYSTEM.
-		CANPAGE=0b00000000;; //GET MOB 0 UP TO BAT~~
+		Can_set_mob(0);//CANPAGE=0b00000000;; //GET MOB 0 UP TO BAT~~
 		///////////////////////////	///////////////////////////	///////////////////////////
 
 		//// == CONFIGURE THE TIMESTAMP PRECALER
@@ -113,12 +113,12 @@ void CANhardware::start()
 {
 	if (initialized_)
 	{
-		CANGCON |= (1 << ENASTB);    // START THIS BITCH UP~~~~
+		Can_enable(); //CANGCON |= (1 << ENASTB);    // START THIS BITCH UP~~~~
 	}
 	else
 	{
 		this->setBaudRate(baudRate_);
-		CANGCON |= (1 << ENASTB);    // START THIS BITCH UP~~~~
+		Can_enable(); //CANGCON |= (1 << ENASTB);    // START THIS BITCH UP~~~~
 	}
 }
 
@@ -129,7 +129,7 @@ void CANhardware::start()
 
 void CANhardware::stop()
 {
-	CANGCON &= ~(1 << ENASTB);    // START THIS BITCH UP~~~~
+	Can_disable(); //CANGCON &= ~(1 << ENASTB);    // START THIS BITCH UP~~~~
 }
 
 
@@ -182,18 +182,18 @@ bool CANhardware::hwSend(canPack* message)
 	
 		if (message->mobSerialNumber<MAXIMUM_MOB)
 		{
-			CANPAGE = (message->mobSerialNumber<<MOBNB0);
+			Can_set_mob(message->mobSerialNumber); //CANPAGE = (message->mobSerialNumber<<MOBNB0);
 			restoreRX_=(CANCDMOB & (1<<CONMOB1));
 			restoreRXMOB_ = message->mobSerialNumber; 
 			CANCDMOB &= ~(1<<CONMOB1); 
 
  			this->insertData(message->FULL64BITtxFIELD, message->mobSerialNumber, message->messageDLC);
  			this->setIdentity(message->Identity,message->mobSerialNumber);
-			CANPAGE = (message->mobSerialNumber<<MOBNB0);
+			//CANPAGE = (message->mobSerialNumber<<MOBNB0);
 		}
 		else
 		{
-			CANPAGE = (SEND_MOB_LOCATION<<MOBNB0);	// MAKE SURE THE SEND MULE MOB IS BEING STUFFED, HERE.
+			Can_set_mob(SEND_MOB_LOCATION); //CANPAGE = (SEND_MOB_LOCATION<<MOBNB0);	// MAKE SURE THE SEND MULE MOB IS BEING STUFFED, HERE.
 			//CANCDMOB &= ~(3<<CONMOB0);
 			//CANCDMOB |= (1<<CONMOB1);				//enable RX
 			restoreRX_=(CANCDMOB & (1<<CONMOB1));
@@ -204,7 +204,7 @@ bool CANhardware::hwSend(canPack* message)
 			CANGIE |= (1<<ENTX); 		//ENABLE rx interrupt of this mob
 			this->setIdentity(message->Identity,SEND_MOB_LOCATION);
 			this->insertData(message->FULL64BITtxFIELD, SEND_MOB_LOCATION, message->messageDLC);
-			CANPAGE = (SEND_MOB_LOCATION<<MOBNB0);	// MAKE SURE THE SEND MULE MOB IS BEING STUFFED, HERE.
+			Can_set_mob(SEND_MOB_LOCATION);//CANPAGE = (SEND_MOB_LOCATION<<MOBNB0);	// MAKE SURE THE SEND MULE MOB IS BEING STUFFED, HERE.
 		}
  
 		CANCDMOB |= (1<<CONMOB0); //SEND THE DATA
@@ -221,7 +221,9 @@ void CANhardware::add(Listener* listener, canPack* message)
 	uint8_t i = 0;
 	uint8_t cdMOBValue;
 	uint64_t tempdelete;
-	message->FULL64BITtxFIELD |= (message->mobSerialNumber<<0);
+
+	//message->FULL64BITtxFIELD |= (message->mobSerialNumber<<0); //TODO this doesn't seem to make much sense... why do it?
+
 	if ((message->direction == TX) && !(message->RTRenabled)) //THE MESSAGE DOESN'T NEED A PHYSICAL MOB
 	{ //start from the list bottom (not physical mob locations)
 		for(i=(MAXIMUM_CAN_MESSAGES-1); i>=0; i--)
@@ -250,11 +252,14 @@ void CANhardware::add(Listener* listener, canPack* message)
 			}
 		}
 	}
+	//todo this makes NO SENSE
+	/*
 	message->FULL64BITtxFIELD |= (message->mobSerialNumber<<8);
 	tempdelete = CANPAGE;
 	message->FULL64BITtxFIELD |= tempdelete<<16;
 	tempdelete = CANCDMOB;
 	message->FULL64BITtxFIELD |= tempdelete<<24;
+	*/
 	
 	if (message->mobSerialNumber>=MAXIMUM_MOB)
 	{
@@ -263,19 +268,19 @@ void CANhardware::add(Listener* listener, canPack* message)
 		//Create composite mask and identity for SEND_MOB_LOCATION
 		this->generateComposites();
 		
-		CANPAGE = (SEND_MOB_LOCATION<<MOBNB0);
+		Can_set_mob(SEND_MOB_LOCATION);//CANPAGE = (SEND_MOB_LOCATION<<MOBNB0);
 		CANCDMOB = 0;
 		
 		this->setIdentity(overflowMOBIdent_, SEND_MOB_LOCATION);
 		this->setMask(overflowMOBMask_, SEND_MOB_LOCATION);
 
-		CANPAGE = (SEND_MOB_LOCATION<<MOBNB0);
+		Can_set_mob(SEND_MOB_LOCATION);//CANPAGE = (SEND_MOB_LOCATION<<MOBNB0);
 
 		CANCDMOB &= ~(1<<RPLV); 				//This MOB can't support instant replies
 		CANCDMOB |= (1<<CONMOB1); 				//ENABLE rx of this message (needed for REQUEST)
 		
 		CANGIE |= (1<<ENIT) | (1<<ENRX) | (1<<ENTX); 		//ENABLE rx interrupt of this mob
-		CANCDMOB |= 0x0F & message->messageDLC;//PER DATASHEET, values greater than 8 saturate to 8 in the dlc field
+		Can_set_dlc(0x0F & message->messageDLC); //CANCDMOB |= 0x0F & message->messageDLC;//PER DATASHEET, values greater than 8 saturate to 8 in the dlc field
 	}
 	else
 	{
@@ -325,24 +330,21 @@ void CANhardware::insertData(uint64_t data, uint8_t mob, uint8_t dlc)
 	uint8_t i = 0;
 	if (mob<MAXIMUM_MOB) //CHECK FOR VALID MOB
 	{
-		i = CANPAGE; 
-		i &= ~(0xF<<MOBNB0);
-		i |= (mob<<MOBNB0);	
-
 		ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 		{
-			CANPAGE = i;
+			Can_set_mob(mob); //CANPAGE = i;
+			Can_set_zero_index();
 			//insert the data into the message buffer
 			for (i=0; i<dlc; i++)
 			{
-				CANMSG = 0xFF & (data);
+				Can_set_data_byte(data); //CANMSG = 0xFF & (data);
 				data = (data>>8);
 			}
 			//use i for new purpose
-			i = CANCDMOB;
-			i &= ~(0xF<<DLC0);
-			i |= (dlc<<DLC0);
-			CANCDMOB = i;
+			//i = CANCDMOB;
+			//i &= ~(0xF<<DLC0);
+			//i |= (dlc<<DLC0);
+			Can_set_dlc(dlc); //CANCDMOB = i;
 		}
 	}
 	
@@ -361,12 +363,12 @@ uint64_t CANhardware::extractData(uint8_t mob, uint8_t dlc)
 	data = 0;
 	if (mob<MAXIMUM_MOB) //CHECK FOR VALID MOB
 	{
-		CANPAGE = (mob<<MOBNB0);
+		Can_set_mob(mob); //CANPAGE = (mob<<MOBNB0);
 
 		//extract the data into the message buffer
 		for (i=0; i<dlc; i++)
 		{	
-			temp = CANMSG;
+			temp = Can_get_data_byte();
 			data |= (temp<<shift);
 			shift+=8;
 		}
@@ -401,29 +403,32 @@ void CANhardware::setIdentity(uint32_t identity, uint8_t mob)
 	
 	if (mob<MAXIMUM_MOB) //CHECK FOR VALID MOB
 	{
-		canpageValue = CANPAGE;
-		canpageValue &= ~(0xF<<MOBNB0);
-		canpageValue |= (mob<<MOBNB0);
+		//canpageValue = CANPAGE;
+		//canpageValue &= ~(0xF<<MOBNB0);
+		//canpageValue |= (mob<<MOBNB0);
 		ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 		{
-			CANPAGE = canpageValue;
+			//CANPAGE = canpageValue;
+			Can_set_mob(mob);
 
 			if (canVersionBEnabled_)
 			{
-				CANIDT4 &= ~(0xFF<<3) | 0X07;	  	//0'S inserted to the leftmost 5 bits
+				Can_set_ext_id(identity);
+				/*CANIDT4 &= ~(0xFF<<3) | 0X07;	  	//0'S inserted to the leftmost 5 bits
 				CANIDT4 |= (identity << 3) & 0xF8; 	//Bits 0-4
 				CANIDT3 = 0xFF & (identity >> 5); 	//Bits 5-12
 				CANIDT2 = 0xFF & (identity >> 13);	//Bits 13-20
 				CANIDT1 = 0xFF & (identity >> 21);  //Bits 21-28
-				CANCDMOB |= (1<<IDE);
+				CANCDMOB |= (1<<IDE);*/
 			}
 			else
 			{
-				CANIDT4 &= ~(0xFF<<3) | 0X07;		//0'S inserted to the leftmost 5 bits
-				CANIDT3 = 0x00; 					//unused
-				CANIDT2 = (identity << 5) & 0xE0;	//Bits 0-2
-				CANIDT1 = 0xFF & (identity >> 3);  	//Bits 3-10//unused
-				CANCDMOB &= ~(1<<IDE);
+				Can_set_std_id(identity);
+				//CANIDT4 &= ~(0xFF<<3) | 0X07;		//0'S inserted to the leftmost 5 bits
+				//CANIDT3 = 0x00; 					//unused
+				//CANIDT2 = (identity << 5) & 0xE0;	//Bits 0-2
+				//CANIDT1 = 0xFF & (identity >> 3);  	//Bits 3-10//unused
+				//CANCDMOB &= ~(1<<IDE);
 			}
 		}
 	}
@@ -438,21 +443,23 @@ void CANhardware::setMask(uint32_t mask, uint8_t mob)
 {
 	if (mob<MAXIMUM_MOB) //CHECK FOR VALID MOB
 	{
-		CANPAGE = (mob<<MOBNB0);
+		Can_set_mob(mob); //CANPAGE = (mob<<MOBNB0);
 
 		if (!canVersionBEnabled_)
 		{
+			Can_set_ext_msk(mask); /*
 			CANIDM4 = (0<<RTRMSK) | (1<<IDEMSK);  //require that it be the same length, but accept all rtr
 			CANIDM3 = 0x00;
 			CANIDM2 = 0xFF & (mask<<5);
-			CANIDM1 = 0xFF & (mask>>3);
+			CANIDM1 = 0xFF & (mask>>3);*/
 		}
 		else
 		{
+			Can_set_std_msk(mask); /*
 			CANIDM4 = (0xFF & (mask<<3)) | (0<<RTRMSK) | (1<<IDEMSK);  //require that it be the same length, but accept all rtr
 			CANIDM3 = 0xFF & (mask >> 5);
 			CANIDM2 = 0xFF & (mask >> 13);
-			CANIDM1 = 0xFF & (mask >> 21);
+			CANIDM1 = 0xFF & (mask >> 21);*/
 		}
 	}
 }
@@ -473,11 +480,13 @@ void CANhardware::update(canPack* message)
 		{
 			ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 			{
-				CANPAGE = (message->mobSerialNumber<<MOBNB0);
-				temp = CANCDMOB;
-				temp &= ~((1<<CONMOB1) | (1<<CONMOB0));
-				temp |= ((1 & message->RTRenabled)<<RPLV) | (1<<CONMOB1);//READY FOR RX
-				CANCDMOB = temp;
+				Can_set_mob(message->mobSerialNumber); //CANPAGE = (message->mobSerialNumber<<MOBNB0);
+				/*temp = CANCDMOB;
+				temp &= ~((1<<CONMOB1) | (1<<CONMOB0));*/
+				Can_config_rx();
+				/*temp |= ((1 & message->RTRenabled)<<RPLV) | (1<<CONMOB1);//READY FOR RX
+				CANCDMOB = temp;*/
+				if (message->RTRenabled) {Can_set_rplv();}
 			}
 		}
 	}
@@ -513,7 +522,7 @@ void CANhardware::remove(canPack* identity)
 				this->setIdentity(0, identity->mobSerialNumber);		//REMOVE THE IDENTITY FROM THE MOB
 				this->setMask(UINT32_MAX, identity->mobSerialNumber);	//RESET THE MASK OF THE MOB
 		
-				CANPAGE = (identity->mobSerialNumber<<MOBNB0);
+				Can_set_mob(identity->mobSerialNumber); //CANPAGE = (identity->mobSerialNumber<<MOBNB0);
 				CANCDMOB = 0;
 			}
 
@@ -565,7 +574,7 @@ void CANhardware::rxInterruptHandler(uint8_t mob, uint8_t status)
 				if (listOfMessages_[i].message->mobSerialNumber == mob)
 				{   										//THE INTERRUPT WAS FOR THIS MESSAGE
 							
-					CANPAGE = (listOfMessages_[i].message->mobSerialNumber<<MOBNB0);
+					Can_set_mob(listOfMessages_[i].message->mobSerialNumber); //CANPAGE = (listOfMessages_[i].message->mobSerialNumber<<MOBNB0);
 
 					if ((status & (1<<RXOK)) && !(status & (1<<DLCW))) //if the interrupt is for RX and isn't remote frame
 					{										//THE INTERRUPT WAS FOR A SUCCESSFUL RX

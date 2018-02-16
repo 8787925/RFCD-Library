@@ -13,8 +13,9 @@
 //
 
 #include "config.h"
-#include "Foundation\Listener.h"
 #include "Hardware\CANTypes.h"
+#include "Foundation\Listener.h"
+#include "AtmelLib\lib_mcu\can\can_drv.h"
 
 //
 //Definition guarding
@@ -85,7 +86,7 @@ class CANhardware
 	//setBaudRate(uint8)
 	//
 
-	void setBaudRate(uint8_t baud);
+	void setBaudRate(uint16_t baud);
 
 
 	//
