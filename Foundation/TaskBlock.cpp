@@ -19,7 +19,9 @@ void TaskBlock::executeIfReady()
 	if (readyToRun_)
 	{
 		this->executeList();
+#if DEBUG
 		cout << "exifready " << this->taskPeriod_ << endl;
+#endif
 	}
 }
 
