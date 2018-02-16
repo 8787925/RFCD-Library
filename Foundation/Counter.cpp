@@ -102,6 +102,26 @@ bool Counter::count()
 
 
 //
+//countBy(int16_t)
+//
+
+bool countBy(int16_t countByVal)
+{
+	currentCount_ += countByVal;
+
+	if (direction_ == COUNT_UP)
+	{
+		//copare for greater than
+	}
+	else
+	{
+		//compare for less than
+	}
+
+}
+
+
+//
 //forceCompare()
 //
 
@@ -149,6 +169,15 @@ uint64_t Counter::getCount()
 	return currentCount_;
 }
 
+
+//
+//setCount(uint64_t)
+//
+
+void setCount(uint64_t newCount)
+{
+	return;
+}
 
 //
 //update(...)

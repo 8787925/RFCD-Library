@@ -45,10 +45,20 @@ class Counter
 
 
 	//
+	//countBy(int16_t);
+	//
+	//returns the true or false nature of the counter, but increments or derements the count based on the value handed to the method
+	//
+
+	bool countBy(int16_t);
+
+
+	//
 	//getCount()
 	//
 
 	uint64_t getCount();
+	void setCount(uint64_t newCount);
 
 
 	//
