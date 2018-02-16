@@ -8,8 +8,8 @@
 #ifndef FOUNDATION_POINTERLISTKIT_H_
 #define FOUNDATION_POINTERLISTKIT_H_
 
-#ifndef __STDINT_H_
-#include "Application\TestAdapter.h"
+#ifndef TEST
+//#include "Application\TestAdapter.h"
 #endif
 
 #define POINTER_flag_SUCCESS_position 5
