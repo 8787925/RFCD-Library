@@ -22,7 +22,8 @@ enum CounterType
 {
 	WRAPPED,
 	SINGLE,
-	FREE
+	FREE,
+	LIMITED
 };
 
 

@@ -93,6 +93,21 @@ bool Counter::count()
 				listener_->listenerEvent();
 			}
 		}
+		else if (type_ == LIMITED)
+		{
+			if (direction_ == COUNT_UP)
+			{
+				currentCount_ -= (direction_ * (1 & enabled_)); //keep the count suspended 1 away from being true, resulting in an always true count() return
+			}
+			else
+			{
+				currentCount_ += (direction_ * (1 & enabled_));//keep the count suspended 1 away from being true, resulting in an always true count() return
+			}
+			if (listener_ != 0)
+			{
+				listener_->listenerEvent();
+			}
+		}
 
 		return true;
 	}
@@ -105,19 +120,30 @@ bool Counter::count()
 //countBy(int16_t)
 //
 
-bool countBy(int16_t countByVal)
+bool countBy(int16_t countByVal) //this is pretty inefficient counting code, because it calls the count() method repeatedly until done
 {
-	currentCount_ += countByVal;
-
-	if (direction_ == COUNT_UP)
+	CounterDirection tempDirection = direction_;
+	bool returnValue = false;
+	if (countByVal < 0) //count down
 	{
-		//copare for greater than
+		direction_ = COUNT_DOWN;
+		for (int i=0; i>countByVal; i--)
+		{
+			returnValue |= this->count();
+		}
 	}
 	else
 	{
-		//compare for less than
+		direction_ = COUNT_UP;
+		for (int i=0; i<countByVal; i++)
+		{
+			returnValue |= this->count();
+		}
 	}
 
+	direction_ = tempDirection;
+
+	return returnValue;
 }
 
 
