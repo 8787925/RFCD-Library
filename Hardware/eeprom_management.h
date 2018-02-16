@@ -1,6 +1,8 @@
 #ifndef EEPROM_CAL
 #define EEPROM_CAL
 
+#include "config.h"
+
 class eeprom_management 
 {
 public: 	
@@ -12,17 +14,21 @@ static eeprom_management* instance();
 
 
 //
-//write(uint16)
+//write()
 //
 
-void write(unsigned char address, uint8_t Data);
+void write_byte(uint16_t address, uint8_t Data);
+bool write(uint16_t address, void* buffer, uint16_t size);
 
 
 //
-//read(uint16)
+//read()
 //
 
-uint8_t read(uint8_t address); 
+uint8_t read_byte(uint16_t address);
+bool read(uint16_t address, void* buffer, uint16_t size);
+
+
 private:
 
 //

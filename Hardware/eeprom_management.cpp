@@ -1,5 +1,5 @@
 ﻿
-#include <eeprom_management.h>
+#include <Hardware/eeprom_management.h>
 #include <avr/eeprom.h>
 
 //
@@ -17,26 +17,30 @@ eeprom_management* eeprom_management::instance()
 //write(uint8, uint8)
 //
 
-void eeprom_management::write(unsigned char address, uint8_t Data)
+void eeprom_management::write_byte(uint16_t address, uint8_t Data)
 {
 	/* Wait for completion of previous write */
-	while(EECR & (1<<EEWE))
-	;
+	eeprom_busy_wait(); //while(EECR & (1<<EEWE));
 	/* Set up address and data registers */
-	EEAR = address;
-	EEDR = Data;
-	/* Write logical one to EEMWE */
-	EECR |= (1<<EEMWE);
-	/* Start eeprom write by setting EEWE */
-	EECR |= (1<<EEWE);
+	this->write(address, &Data, 1);
 }
 
 
 //
-//read(uint8)
+//write_block(*src, *dst, size)
 //
 
-uint8_t eeprom_management::read(uint8_t address)
+bool eeprom_management::write(uint16_t address, void* buffer, uint16_t size)
+{
+	eeprom_update_block(buffer, &address, size_t(size));
+}
+
+
+//
+//read_byte(uint16)
+//
+
+uint8_t eeprom_management::read_byte(uint16_t address)
 {
 	/* Wait for completion of previous write */
 	while(EECR & (1<<EEWE))
@@ -47,6 +51,16 @@ uint8_t eeprom_management::read(uint8_t address)
 	EECR |= (1<<EERE);
 	/* Return data from data register */
 	return EEDR;
+}
+
+
+//
+//read(address, *data, size)
+//
+
+bool eeprom_management::read(uint16_t address, void* buffer, uint16_t size)
+{
+	eeprom_read_block(buffer, &address, size);
 }
 
 
